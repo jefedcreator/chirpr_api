@@ -1,4 +1,5 @@
 # from sqlalchemy import *
+import sys
 from tkinter.messagebox import NO
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
@@ -129,15 +130,13 @@ def add_user():
     new_id = body.get("id", None)
     new_name = body.get("name", None)
     new_url = body.get("url", None)
-    new_tweets = body.get("tweets", [])
-    print("details are:", new_id, new_name,new_url,new_tweets)
-
+    new_tweets = body.get("tweets", None)
+    
     try:
         user = Users(id=new_id,name=new_name,avatar_url=new_url,tweet_id=new_tweets)
         db.session.add(user)
         db.session.commit()
         users = Users.query.order_by(Users.id).all()
-        print('users', users)
         user_obj = {}
         for user in users:
             user_obj[user.id] = {
@@ -155,88 +154,54 @@ def add_user():
         )
 
     except:
+        db.session.rollback()
+        print(sys.exc_info())
         abort(422)
 
+    finally:
+        db.session.close()
 
-@app.route('/users/<user_id>', methods=['PATCH', 'GET'])
-def update_user(user_id):
-    if request.method == 'PATCH':
-        body = request.get_json()
-        print("body is:", body)
-        try:
-            user = Users.query.filter(Users.id==user_id).one_or_none()
-            print("tweet is:", user.tweet_id)
-            if user is None:
-                abort(400)
-            
-            if "tweets" in body:
-                for index in range(len(user.tweet_id)):
-                    if user.tweet_id[index] == body.get("tweets"):
-                        # print("present",body.get("tweets"))
-                        value = user.tweet_id.pop(index)
-                        print("value:", value)
-                        # user.tweet_id.remove(value)
-                        db.session.commit()
-                    
-                    return jsonify(
-                        {
-                            "success": True,
-                            "likes": user.tweet_id
-                        }
-                    )
 
-                else:
-                    user.tweet_id.append(body.get("tweets"))
-                    db.session.commit()
-            
-                    return jsonify(
-                        {
-                            "success": True,
-                            "likes": user.tweet_id
-                        }
-                    )
+@app.route('/users/<user_id>', methods=['GET'])
+def get_user(user_id):
+    try:
+        user = Users.query.filter(Users.id==user_id).one_or_none()
+        tweets = Tweets.query.filter(Tweets.author==user_id).all()
+        print("tweet is:", user.tweet_id)
+        if user is None:
+            abort(400)
 
-        except:
-            abort(404)
-
-    if request.method == 'GET':
-        try:
-            user = Users.query.filter(Users.id==user_id).one_or_none()
-            tweets = Tweets.query.filter(Tweets.author==user_id).all()
-            print("tweet is:", user.tweet_id)
-            if user is None:
-                abort(400)
-
-            tweet_list = []
-            
-            for tweet in tweets:
-                tweet_obj = {
-                    "id": tweet.id,
-                    "text": tweet.text,
-                    "author": tweet.author,
-                    "timestamp": tweet.timestamp,
-                    "likes": tweet.likes,
-                    "replies": tweet.replies,
-                    "replying_to": tweet.replying_to
-                }
-                tweet_list.append(tweet_obj)
-            
-            user_list = [{
-                "id": user.id,
-                "name": user.name,
-                "avatar_url": user.avatar_url,
-                "tweet_id": user.tweet_id,
-                "tweets": tweet_list
-            }]
-
-            return jsonify({
-                "success": True,
-                "user" : user_list
-            })
-            
+        tweet_list = []
         
-        except:
-            abort(404)
+        for tweet in tweets:
+            tweet_obj = {
+                "id": tweet.id,
+                "text": tweet.text,
+                "author": tweet.author,
+                "timestamp": tweet.timestamp,
+                "likes": tweet.likes,
+                "replies": tweet.replies,
+                "replying_to": tweet.replying_to
+            }
+            tweet_list.append(tweet_obj)
+        
+        user_list = [{
+            "id": user.id,
+            "name": user.name,
+            "avatar_url": user.avatar_url,
+            "tweet_id": user.tweet_id,
+            "tweets": tweet_list
+        }]
+
+        return jsonify({
+            "success": True,
+            "user" : user_list
+        })
+        
+    
+    except:
+        print(sys.exc_info())
+        abort(404)
         
 
 
@@ -273,7 +238,9 @@ def add_tweet():
     new_replying_to = body.get("replying_to", None)
     try:
         tweet = Tweets(id=new_id,text=new_text,author=new_author,timestamp=new_timestamp,likes=new_likes,replies=new_replies,replying_to=new_replying_to)
+        user = Users.query.filter(Users.id==new_author).one_or_none()
         db.session.add(tweet)
+        user.tweet_id.append(new_id)
         db.session.commit()
         tweets = Tweets.query.order_by(Tweets.id).all()
         all_tweets = {}
@@ -294,7 +261,13 @@ def add_tweet():
         })
     
     except:
+        db.session.rollback()
+        print(sys.exc_info())
         abort(422)
+    
+    finally:
+        db.session.close()
+
 
 @app.route('/tweets/<tweet_id>', methods=['PATCH', 'GET'])
 def update_tweet(tweet_id):
@@ -302,12 +275,12 @@ def update_tweet(tweet_id):
         body = request.get_json()
         print("body is:", body)
         try:
-            tweet = Tweets.query.filter(Tweets.id==tweet_id).all()
+            tweet = Tweets.query.filter(Tweets.id==tweet_id).one_or_none()
             print("tweet is:", tweet.likes)
 
             if tweet is None:
                 abort(400)
-            
+
             if "likes" in body:
                 for index in range(len(tweet.likes)):
                     if tweet.likes[index] == body.get("likes"):
@@ -320,7 +293,8 @@ def update_tweet(tweet_id):
                         return jsonify(
                             {
                                 "success": True,
-                                "likes": tweet.likes
+                                "likes": tweet.likes,
+                                "likes_len":len(tweet.likes)
                             }
                         )
                 
@@ -334,7 +308,8 @@ def update_tweet(tweet_id):
                     return jsonify(
                         {
                             "success": True,
-                            "likes": tweet.likes
+                            "likes": tweet.likes,
+                            "likes_len":len(tweet.likes)
                         }
                     )
             
@@ -350,7 +325,8 @@ def update_tweet(tweet_id):
                         return jsonify(
                             {
                                 "success": True,
-                                "replies": tweet.replies
+                                "replies": tweet.replies,
+                                "replies_len": len(tweet.replies)
                             }
                         )
                 
@@ -364,7 +340,8 @@ def update_tweet(tweet_id):
                     return jsonify(
                         {
                             "success": True,
-                            "replies": tweet.replies
+                            "replies": tweet.replies,
+                            "replies_len": len(tweet.replies)
                         }
                     )
             
@@ -380,27 +357,29 @@ def update_tweet(tweet_id):
                     )
 
         except:
+            db.session.rollback()
+            print(sys.exc_info())
             abort(404)
+        
+        finally:
+            db.session.close()
 
     if request.method == 'GET':
         try:
-            tweets = Tweets.query.filter(Tweets.id==tweet_id).one_or_none()
-            print("tweets:", tweets)
-            
-
+            tweet = Tweets.query.filter(Tweets.id==tweet_id).one_or_none()
+        
             if tweets is not None: 
                 tweet_list = []  
-                for tweet in tweets:
-                    tweet_obj = {
-                        "id": tweet.id,
-                        "text": tweet.text,
-                        "author": tweet.author,
-                        "timestamp": tweet.timestamp,
-                        "likes": tweet.likes,
-                        "replies": tweet.replies,
-                        "replying_to": tweet.replying_to
-                    }
-                    tweet_list.append(tweet_obj)
+                tweet_obj = {
+                    "id": tweet.id,
+                    "text": tweet.text,
+                    "author": tweet.author,
+                    "timestamp": tweet.timestamp,
+                    "likes": tweet.likes,
+                    "replies": tweet.replies,
+                    "replying_to": tweet.replying_to
+                }
+                tweet_list.append(tweet_obj)
 
             return jsonify(
                 {
@@ -410,6 +389,7 @@ def update_tweet(tweet_id):
             )
         
         except:
+            print(sys.exc_info())
             abort(404)
 
 
@@ -448,7 +428,7 @@ def add_bookmark():
         bookmark = Bookmarks(id=new_id,text=new_text,author=new_author,timestamp=new_timestamp,likes=new_likes,replies=new_replies,replying_to=new_replying_to)
         db.session.add(bookmark)
         db.session.commit()
-        bookmarks = Bookmarks.query.order_by(Tweets.id).all()
+        bookmarks = Bookmarks.query.order_by(Bookmarks.id).all()
         all_bookmarks = {}
         for bookmark in bookmarks:
             all_bookmarks[bookmark.id] = {
@@ -467,38 +447,44 @@ def add_bookmark():
         })
     
     except:
+        db.session.rollback()
+        print(sys.exc_info())
         abort(422)
+    
+    finally:
+        db.session.close()
 
 @app.route('/bookmarks/<bookmark_id>', methods=['GET', 'DELETE'])
-def add_bookmark(bookmark_id):
+def update_bookmark(bookmark_id):
     if request.method == 'GET':
         try:
-            bookmarks = Bookmarks.query.filter(Bookmarks.id==bookmark_id).one_or_none()
-            print("tweets:", bookmarks)
-            
+            bookmark = Bookmarks.query.filter(Bookmarks.id==bookmark_id).one_or_none()
 
-            if bookmarks is not None: 
-                bookmark_list = []  
-                for bookmark in bookmarks:
-                    tweet_obj = {
-                        "id": bookmark.id,
-                        "text": bookmark.text,
-                        "author": bookmark.author,
-                        "timestamp": bookmark.timestamp,
-                        "likes": bookmark.likes,
-                        "replies": bookmark.replies,
-                        "replying_to": bookmark.replying_to
-                    }
-                    bookmark_list.append(tweet_obj)
-
-            return jsonify(
-                {
-                    "success": True,
-                    "tweets": bookmark_list
+            if bookmark is not None: 
+                bookmark_list = []          
+                tweet_obj = {
+                    "id": bookmark.id,
+                    "text": bookmark.text,
+                    "author": bookmark.author,
+                    "timestamp": bookmark.timestamp,
+                    "likes": bookmark.likes,
+                    "replies": bookmark.replies,
+                    "replying_to": bookmark.replying_to
                 }
-            )
+                bookmark_list.append(tweet_obj)
+
+                return jsonify(
+                    {
+                        "success": True,
+                        "tweets": bookmark_list
+                    }
+                )
+
+            else:
+                abort(400)
         
         except:
+            print(sys.exc_info())
             abort(404)
     
     if request.method == 'DELETE':
@@ -508,7 +494,12 @@ def add_bookmark(bookmark_id):
 
             return jsonify({"success": True})
         except:
+            db.session.rollback()
+            print(sys.exc_info())
             abort(404)
+        
+        finally:
+            db.session.close()
 
 
 @app.errorhandler(404)
