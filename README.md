@@ -2,7 +2,7 @@
 A Twitter esque social media with search Bookmark functionality
 
 ## Introduction
-
+Twitter is a popular micro blogging social media where users can share tweets on their timeline, and also save particulat tweets theyre interested in a bookmarks section. but twitter requires users to keep scrolling in their bookmark sections whenever they're in need of a particular bookmarked tweet. Enter chirpr, chirpr aims to solve this UX problem by introducing searchable boomarks in every user's bookmark section, just by typing particular words in the search bar, bookmarked tweets are filtered by the typed keywords. 
 ## Overview
 ## Getting Started
 
@@ -37,6 +37,9 @@ These are the files relevant for this project:
 .
 ├── flaskr
     ├── __init__.py
+├── models.py
+├── settings.py
+├── test.py
 ├── README.md
 ├── requirements.txt
 ```
@@ -89,3 +92,183 @@ Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or
 ## API Example
 
 `GET '/api/v1.0/users'`
+- Fetches a dictionary of all users in which the keys are the user ids and the value is the corresponding dictionary of the user  details
+- Request Arguments: None
+- Returns: An object with a two key,`success`, that contains a value of `True` if successful and `users`, that contains an object of `user_obj ` key: value pairs.
+
+```json
+{
+  "success" : "True",
+  "users": "user_obj"
+}
+```
+
+`POST '/api/v1.0/users/create'`
+
+Sends a post request in order to create a new user dictionary with user details
+Request Body:
+
+```json
+{
+    "id": "user id",
+    "name": "user name",
+    "url": "user url",
+    "tweets": "[]",
+}
+```
+
+Returns: An object with a two key,`success`, that contains a value of `True` if successful and `users`, that contains an object of `user_obj ` key: value pairs.
+
+```json
+{
+    
+    "success" : "True",
+    "users": "user_obj"
+}
+```
+
+`GET '/api/v1.0/users/${user_id}'`
+
+Fetches entire user details, including tweets for a user specified by their id request argument
+Request Arguments: id - string
+Returns: A list of objects with user details for the specified user, and a list of all user tweets
+
+```json
+{
+    "success": "True",
+    "user" : "user_list"
+}
+```
+
+`GET '/api/v1.0/tweets'`
+
+- Fetches a dictionary of all tweets in which the keys are the tweet ids and the value is the corresponding dictionary of the tweet  details
+- Request Arguments: None
+- Returns: An object with a two key,`success`, that contains a value of `True` if successful and `tweets`, that contains an object of `tweets ` key: value pairs.
+
+```json
+{
+  "success" : "True",
+  "users": "all_tweets"
+}
+```
+
+`POST '/api/v1.0/tweets/create'`
+
+Sends a post request in order to create a new tweet dictionary with tweet details
+Request Body:
+
+```json
+{
+    "id": "tweet id",
+    "text": "tweet text",
+    "author": "tweet author",
+    "timestamp": "123",
+    "likes": "[]",
+    "replies": "[]",
+    "replying_to": ""
+}
+```
+
+Returns: An object with a two key,`success`, that contains a value of `True` if successful and `tweets`, that contains an object of `all_tweets ` key: value pairs.
+
+```json
+{
+    
+    "success" : "True",
+    "tweets": "all_tweets"
+}
+```
+
+`GET '/api/v1.0/tweets/${tweet_id}'`
+
+Fetches entire tweet details, including tweets for a user specified by their id request argument
+Request Arguments: id - string
+Returns: A list of objects with tweet details for the specified tweet id
+
+```json
+{
+    "success": "True",
+    "user" : "tweet_list"
+}
+```
+
+`PATCH '/api/v1.0/tweets/${tweet_id}'`
+
+Modifies the `likes` and `replies` column specified by the `tweet_id`. this request checks if a `user's likes` already exists within the likes array and pops it, else appends to it.
+this request also checks if a `user's replies` already exists within the replies array and pops it, else appends to it.
+this request also checks if a tweet is a reply to another tweet to it, else null.
+
+Request Body:
+
+```json
+{
+    "likes": "user id",
+    "replies": "user replies",
+    "replying_to": "tweet id"
+}
+```
+
+`GET '/api/v1.0/bookmarks'`
+- Fetches a dictionary of all bookmarks in which the keys are the bookmarks ids and the value is the corresponding dictionary of the bookmark details
+- Request Arguments: None
+- Returns: An object with a two key,`success`, that contains a value of `True` if successful and `bookmarks`, that contains an object of `bookmarks ` key: value pairs.
+
+```json
+{
+  "success" : "True",
+  "tweets": "all_bookmarks"
+}
+```
+
+`POST '/api/v1.0/bookmarks/create'`
+
+Sends a post request in order to create a new bookmark dictionary with tweet details
+Request Body:
+
+```json
+{
+    "id": "bookmark id",
+    "text": "bookmark text",
+    "author": "bookmark author",
+    "timestamp": "123",
+    "likes": "[]",
+    "replies": "[]",
+    "replying_to": ""
+}
+```
+
+Returns: An object with a two key,`success`, that contains a value of `True` if successful and `tweets`, that contains an object of `all_tweets ` key: value pairs.
+
+```json
+{
+    
+    "success" : "True",
+    "tweets": "all_bookmarks"
+}
+```
+
+`GET '/api/v1.0/tweets/${bookmark_id}'`
+
+Fetches entire bookmark details, including bookmarks for a user specified by their id request argument
+Request Arguments: id - string
+Returns: A list of objects with tweet details for the specified bookmark id
+
+```json
+{
+    "success": "True",
+    "tweets": "bookmark_list"
+}
+```
+
+`DELETE '/api/v1.0/tweets/${bookmark_id}'`
+
+deletes entire bookmark details, including bookmarks for a user specified by their id request argument
+Request Arguments: id - string
+Returns: `success` with value of `True`
+
+```json
+{
+    "success": "True"
+}
+```
