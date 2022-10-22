@@ -4,6 +4,7 @@ import json
 from flaskr import create_app
 from models import setup_db, Users, Tweets,Bookmarks, db
 from settings import DB_NAME, DB_PASSWORD, DB_USER
+from flask_sqlalchemy import SQLAlchemy
 # from settings import DB_NAME, DB_USER, DB_PASSWORD
 
 class ChirprTestCase(unittest.TestCase):
@@ -17,24 +18,24 @@ class ChirprTestCase(unittest.TestCase):
         self.database_path = "postgresql://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,'localhost:5432', DB_NAME)
         setup_db(self.app, self.database_path)
         self.new_user = {
-            "id": "random_author_1",
+            "id": "random_author",
             "name": "Test User",
             "url": "https://demo.jpg",
             "tweets": [],
         }
         self.new_tweet = {
-        "id": "8xf0y6ziyjabvozdd253ne",
+        "id": "8xf0y6ziyjabvozdd253ng",
         "text": "Shoutout to all the speakers I know for whom English is not a first language, but can STILL explain a concept well. It's hard enough to give a good talk in your mother tongue!",
-        "author": "random_author_1",
+        "author": "sarah_edo",
         "timestamp": 1518122597860,
         "likes": [],
         "replies": [],
         "replying_to": "",
         }
         self.new_bookmark = {
-        "id": "8xf0y6ziyjabvozdd253ne",
+        "id": "8xf0y6ziyjabvozdd253ng",
         "text": "Shoutout to all the speakers I know for whom English is not a first language, but can STILL explain a concept well. It's hard enough to give a good talk in your mother tongue!",
-        "author": "random_author_1",
+        "author": "sarah_edo",
         "timestamp": 1518122597860,
         "likes": [],
         "replies": [],
@@ -49,15 +50,15 @@ class ChirprTestCase(unittest.TestCase):
         self.replying_to = {
             "replying_to": "parent_tweet_id"
         }
-        # self.search = {"searchTerm": "title"}
-        # self.new_quiz_wrong = {'question': []}
-        # self.new_quiz = {'previous_questions': [18,20,21],'quiz_category': {'type': 'play', 'id': 5}}
+        self.search_term = {
+            "search_term": "speakers"
+        }
         # binds the app to the current context
-        # with self.app.app_context():
-        #     self.db = SQLAlchemy()
-        #     self.db.init_app(self.app)
-        #     # create all tables
-        #     self.db.create_all()
+        with self.app.app_context():
+            self.db = SQLAlchemy()
+            self.db.init_app(self.app)
+            # create all tables
+            self.db.create_all()
     
     def tearDown(self):
         """Executed after reach test"""
@@ -71,7 +72,6 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data, b'Hello, World!')
-        # self.assertEqual(len(data['categories']),6)
         
     def test_smiley(self):
         res = self.client().get('/smiley')
@@ -79,7 +79,6 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data, b':)')
-        # self.assertEqual(len(data['categories']),6)
 
     def test_get_users(self):
         res = self.client().get('/users')
@@ -87,7 +86,6 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
 
     def test_create_users(self):
         res = self.client().post('/users/create', json=self.new_user)
@@ -98,7 +96,6 @@ class ChirprTestCase(unittest.TestCase):
         self.assertEqual(data['success'], True)
         # db.session.rollback()
 
-        # self.assertEqual(len(data['categories']),6)
 
     def test_get_user_by_id(self):
         res = self.client().get('/users/{}'.format(self.new_user['id']))
@@ -106,7 +103,6 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
     
     def test_get_tweets(self):
         res = self.client().get('/tweets')
@@ -114,18 +110,14 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
     
     def test_create_tweets(self):
         res = self.client().post('/tweets/create', json=self.new_tweet)
-        # db.session.flush()
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # db.session.rollback()
 
-        # self.assertEqual(len(data['categories']),6)
 
     def test_get_tweets_by_id(self):
         res = self.client().get('/tweets/{}'.format(self.new_tweet['id']))
@@ -133,7 +125,6 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
 
     def test_like_tweets_by_id(self):
         res = self.client().patch('/tweets/{}'.format(self.new_tweet['id']),json=self.like_tweet)
@@ -141,7 +132,6 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
 
     def test_reply_tweets_by_id(self):
         res = self.client().patch('/tweets/{}'.format(self.new_tweet['id']),json=self.reply_tweet)
@@ -149,7 +139,6 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
 
     def test_replying_to_tweets_by_id(self):
         res = self.client().patch('/tweets/{}'.format(self.new_tweet['id']),json=self.replying_to)
@@ -157,11 +146,9 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
     
     def test_create_bookmark(self):
         res = self.client().post('/bookmarks/create', json=self.new_bookmark)
-        # db.session.flush()
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
@@ -174,23 +161,27 @@ class ChirprTestCase(unittest.TestCase):
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
 
-    def test_get_bookmark_by_id(self):
-        res = self.client().get('/bookmarks/{}'.format(self.new_bookmark['id']))
+    def test_get_bookmark_by_user(self):
+        res = self.client().get('/bookmarks/{}'.format(self.new_bookmark['author']))
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
 
-    def test_get_bookmark_by_id(self):
+    def test_delete_bookmark_by_id(self):
         res = self.client().delete('/bookmarks/{}'.format(self.new_bookmark['id']))
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # self.assertEqual(len(data['categories']),6)
+
+    def test_search_bookmark_by_term(self):
+        res = self.client().post('/bookmarks/search', json=self.search_term)
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
 
     
 

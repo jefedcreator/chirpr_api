@@ -1,28 +1,10 @@
-# from sqlalchemy import *
 import sys
-from tkinter.messagebox import NO
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import null
-
-from sqlalchemy.orm.attributes import flag_modified
 from models import setup_db, Users, Tweets,Bookmarks,db
-
-# db.create_all()
-
 
 # Create and configure the app
 # Include the first parameter: Here, __name__is the name of the current Python module.
-
-# Return the app instance
-#  return app
-
-# app = Flask(__name__)
-# CORS(app)
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:hemid8th@localhost:5432/chirpr'
-# app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 
 def create_app(test_config=None):
     app = Flask(__name__)
@@ -47,7 +29,6 @@ def create_app(test_config=None):
     @app.route('/users')
     def users():
         users = Users.query.order_by(Users.id).all()
-        print('users', users)
         user_obj = {}
         for user in users:
             user_obj[user.id] = {
@@ -108,7 +89,7 @@ def create_app(test_config=None):
         try:
             user = Users.query.filter(Users.id==user_id).one_or_none()
             tweets = Tweets.query.filter(Tweets.author==user_id).all()
-            print("tweet is:", user.tweet_id)
+
             if user is None:
                 abort(400)
 
@@ -169,7 +150,6 @@ def create_app(test_config=None):
     @app.route('/tweets/create', methods=['POST'])
     def add_tweet():
         body = request.get_json()
-        print("body is:", body)
         new_id = body.get("id", None)
         new_text = body.get("text", None)
         new_author = body.get("author", None)
@@ -214,10 +194,8 @@ def create_app(test_config=None):
     def update_tweet(tweet_id):
         if request.method == 'PATCH':
             body = request.get_json()
-            print("body is:", body)
             try:
                 tweet = Tweets.query.filter(Tweets.id==tweet_id).one_or_none()
-                print("tweet is:", tweet.likes)
 
                 if tweet is None:
                     abort(400)
@@ -227,7 +205,6 @@ def create_app(test_config=None):
                         if tweet.likes[index] == body.get("likes"):
                             # print("present",body.get("tweets"))
                             value = tweet.likes.pop(index)
-                            print("value:", value)
                             # user.tweet_id.remove(value)
                             db.session.commit()
                         
@@ -243,9 +220,6 @@ def create_app(test_config=None):
                         tweet.likes.append(body.get("likes"))
                         db.session.commit()
                 
-
-                        print("tweet is:", body.get("likes"))
-                        print("likes are:", tweet.likes)
                         return jsonify(
                             {
                                 "success": True,
@@ -258,8 +232,7 @@ def create_app(test_config=None):
                     for index in range(len(tweet.replies)):
                         if tweet.replies[index] == body.get("replies"):
                             # print("present",body.get("tweets"))
-                            value = tweet.replies.pop(index)
-                            print("value:", value)
+                            tweet.replies.pop(index)
                             # user.tweet_id.remove(value)
                             db.session.commit()
                         
@@ -274,10 +247,7 @@ def create_app(test_config=None):
                     else:
                         tweet.replies.append(body.get("replies"))
                         db.session.commit()
-                
 
-                        print("tweet is:", body.get("replies"))
-                        print("replies are:", tweet.replies)
                         return jsonify(
                             {
                                 "success": True,
@@ -357,7 +327,6 @@ def create_app(test_config=None):
     @app.route('/bookmarks/create', methods=['POST'])
     def add_bookmark():
         body = request.get_json()
-        print("body is:", body)
         bookmark_id = body.get("id", None)
         bookmark_text = body.get("text", None)
         bookmark_author = body.get("author", None)
@@ -430,7 +399,7 @@ def create_app(test_config=None):
         
         if request.method == 'DELETE':
             try:
-                bookmarks = Bookmarks.query.filter(Bookmarks.id==bookmark_id).delete()
+                Bookmarks.query.filter(Bookmarks.id==bookmark_id).delete()
                 db.session.commit()
 
                 return jsonify({"success": True})
@@ -446,22 +415,24 @@ def create_app(test_config=None):
     def search_bookmarks():
         try:
             body = request.get_json()
-            search_term = body.get('searchTerm')
+            search_term = body.get('search_term')
             search = "%{}%".format(search_term.replace(" ", "\ "))
             
-        
             search_results = Bookmarks.query.filter(Bookmarks.text.match(search)).all()
             
             bookmarks = []
+
             for result in search_results:
                 bookmarks.append(
-                    result.format()
+                   {
+                    "id": result.id,
+                    "text": result.text
+                   }
                 )
 
             return jsonify({
                 'success': True,
-                'questions': bookmarks,
-                'total_questions': len(search_results),
+                'bookmarks': bookmarks
             })
 
         except:
@@ -488,7 +459,10 @@ def create_app(test_config=None):
 
     @app.errorhandler(400)
     def bad_request(error):
-        return jsonify({"success": False, "error": 400, "message": "bad request"}), 400
+        return (
+            jsonify({"success": False, "error": 400, "message": "bad request"}), 
+            400
+        )
 
     @app.errorhandler(405)
     def not_found(error):

@@ -248,7 +248,7 @@ Returns: An object with a two key,`success`, that contains a value of `True` if 
 }
 ```
 
-`GET '/api/v1.0/tweets/${bookmark_id}'`
+`GET '/api/v1.0/bookmarks/${bookmark_id}'`
 
 Fetches entire bookmark details, including bookmarks for a user specified by their id request argument
 Request Arguments: id - string
@@ -261,7 +261,7 @@ Returns: A list of objects with tweet details for the specified bookmark id
 }
 ```
 
-`DELETE '/api/v1.0/tweets/${bookmark_id}'`
+`DELETE '/api/v1.0/bookmarks/${bookmark_id}'`
 
 deletes entire bookmark details, including bookmarks for a user specified by their id request argument
 Request Arguments: id - string
@@ -270,5 +270,16 @@ Returns: `success` with value of `True`
 ```json
 {
     "success": "True"
+}
+```
+
+`POST '/api/v1.0/bookmarks/search'`
+
+Receives a json request `search_term` and filters the Bookmark database, and returns a list of Bookmarks containing `id` and `text` object that match specified request
+
+```json
+{
+    "success": "True",
+    "bookmarks": "bookmarks"
 }
 ```
