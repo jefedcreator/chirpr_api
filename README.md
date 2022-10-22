@@ -283,3 +283,9 @@ Receives a json request `search_term` and filters the Bookmark database, and ret
     "bookmarks": "bookmarks"
 }
 ```
+
+## Testing
+```bash
+
+python test.py
+```
