@@ -1,1 +1,1 @@
-web: gunicorn chirpr:app
+web: gunicorn __init__:app
