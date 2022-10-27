@@ -4,7 +4,7 @@ from sqlalchemy.sql.schema import PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import BIGINT
 from sqlalchemy.ext.mutable import Mutable
-from settings import DB_NAME, DB_USER, DB_PASSWORD
+from settings.settings import DB_NAME, DB_USER, DB_PASSWORD
 
 database_path ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
 db = SQLAlchemy()

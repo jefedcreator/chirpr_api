@@ -1,13 +1,13 @@
 import sys
 from flask import Flask, jsonify, request, abort
+from models.models import setup_db, Users, Tweets,Bookmarks,db
 from flask_cors import CORS
-from models import setup_db, Users, Tweets,Bookmarks,db
 
 # Create and configure the app
 # Include the first parameter: Here, __name__is the name of the current Python module.
 
+app = Flask(__name__)
 def create_app(test_config=None):
-    app = Flask(__name__)
     with app.app_context():
     # db = SQLAlchemy(app)
         setup_db(app)
@@ -425,10 +425,10 @@ def create_app(test_config=None):
 
             for result in search_results:
                 bookmarks.append(
-                   {
+                {
                     "id": result.id,
                     "text": result.text
-                   }
+                }
                 )
 
             return jsonify({
@@ -472,8 +472,9 @@ def create_app(test_config=None):
             405,
         )
 
-    #always include this at the bottom of your code
-    if __name__ == '__main__':
-        app.run(host="0.0.0.0", port=3000) 
+    
 
     return app
+    #always include this at the bottom of your code
+if __name__ == '__main__':
+    create_app().run(host='0.0.0.0', port=5000, debug=True)
