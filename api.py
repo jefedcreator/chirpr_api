@@ -19,6 +19,10 @@ def create_app(test_config=None):
         response.headers.add("Access-Control-Allow-Headers", "GET, POST, PATCH, DELETE, OPTION")
         return response
 
+    @app.route("/favicon.ico")
+    def favicon():
+        return "", 200
+
     @app.route('/')
     def hello_world():
         return 'Hello, World!'
