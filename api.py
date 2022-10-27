@@ -13,11 +13,11 @@ with app.app_context():
 
     # db = SQLAlchemy(app)
 
-@app.after_request
-def after_request(response):
-    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
-    response.headers.add("Access-Control-Allow-Headers", "GET, POST, PATCH, DELETE, OPTION")
-    return response
+# @app.after_request
+# def after_request(response):
+#     response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+#     response.headers.add("Access-Control-Allow-Headers", "GET, POST, PATCH, DELETE, OPTION")
+#     return response
 
 @app.route('/')
 def hello_world():
