@@ -13,11 +13,11 @@ with app.app_context():
 
     # db = SQLAlchemy(app)
 
-# @app.after_request
-# def after_request(response):
-#     response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
-#     response.headers.add("Access-Control-Allow-Headers", "GET, POST, PATCH, DELETE, OPTION")
-#     return response
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Headers", "Content-Type, Authorization")
+    response.headers.add("Access-Control-Allow-Headers", "GET, POST, PATCH, DELETE, OPTION")
+    return response
 
 @app.route('/')
 def hello_world():
@@ -27,25 +27,25 @@ def hello_world():
 def smiley():
     return ':)'
 
-# @app.route('/users')
-# def users():
-#     users = Users.query.order_by(Users.id).all()
-#     user_obj = {}
-#     for user in users:
-#         user_obj[user.id] = {
-#             'id':user.id,
-#             'name':user.name,
-#             'url':user.avatar_url,
-#             'tweets':user.tweet_id
-#         }
+@app.route('/users')
+def users():
+    users = Users.query.order_by(Users.id).all()
+    user_obj = {}
+    for user in users:
+        user_obj[user.id] = {
+            'id':user.id,
+            'name':user.name,
+            'url':user.avatar_url,
+            'tweets':user.tweet_id
+        }
 
 
-#     return jsonify(
-#         {
-#             "success" : True,
-#             "users": user_obj
-#         }
-#     )
+    return jsonify(
+        {
+            "success" : True,
+            "users": user_obj
+        }
+    )
 
 # @app.route('/users/create', methods=['POST'])
 # def add_user():
