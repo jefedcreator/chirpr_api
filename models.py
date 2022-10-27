@@ -15,6 +15,11 @@ def setup_db(app, database_path=database_path):
     db.app = app
     db.init_app(app)
     db.create_all()
+    # with app.app_context():
+        # self.db = SQLAlchemy()
+        # self.db.init_app(self.app)
+        #     # create all tables
+        #     self.db.create_all()
 
 class MutableList(Mutable, list):
     def append(self, value):

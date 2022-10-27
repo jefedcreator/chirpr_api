@@ -8,9 +8,10 @@ from models import setup_db, Users, Tweets,Bookmarks,db
 
 def create_app(test_config=None):
     app = Flask(__name__)
-    setup_db(app)
-    CORS(app)
+    with app.app_context():
     # db = SQLAlchemy(app)
+        setup_db(app)
+        CORS(app)
 
     @app.after_request
     def after_request(response):
