@@ -13,8 +13,8 @@ def setup_db(app):
     app.config["SQLALCHEMY_DATABASE_URI"] = 'postgres://hjuswuwprkjqob:3aad4d3b11016dc411cf037200db4c8482549ea95e54ca34b93e7001638cd1c1@ec2-54-147-36-107.compute-1.amazonaws.com:5432/d4dabpbqs3gli3'
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
     db.app = app
-    db.init_app(app)
-    db.create_all()
+    # db.init_app(app)
+    # db.create_all()
     # with app.app_context():
         # self.db = SQLAlchemy()
         # self.db.init_app(self.app)
