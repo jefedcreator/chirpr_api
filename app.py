@@ -1,19 +1,122 @@
 import sys
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
-from models.models import Users, Tweets,Bookmarks
+# from models.models import Users, Tweets,Bookmarks, setup_db
 from flask_sqlalchemy import SQLAlchemy
 
 # Create and configure the app
 # Include the first parameter: Here, __name__is the name of the current Python module.
-
+from flask_sqlalchemy import SQLAlchemy
+import json
+from sqlalchemy.sql.schema import PrimaryKeyConstraint
+from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import BIGINT
+from sqlalchemy.ext.mutable import Mutable
+from settings.settings import DB_NAME, DB_USER, DB_PASSWORD
 
 # database_path ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
 app = Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://hjuswuwprkjqob:3aad4d3b11016dc411cf037200db4c8482549ea95e54ca34b93e7001638cd1c1@ec2-54-147-36-107.compute-1.amazonaws.com:5432/d4dabpbqs3gli3"
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://hjuswuwprkjqob:3aad4d3b11016dc411cf037200db4c8482549ea95e54ca34b93e7001638cd1c1@ec2-54-147-36-107.compute-1.amazonaws.com:5432/d4dabpbqs3gli3"
+# app.config["SQLALCHEMY_DATABASE_URI"] ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
+
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+# app.config["SQLALCHEMY_BINDS"] = False
+# with app.app_context():
+#     # db.app = app
+#     # db.init_app(app)
+
+#     # db.init_app(app)
+#     db.create_all()
+
+
+
+# def setup_db(app):
+
+    # with app.app_context():
+        # self.db = SQLAlchemy()
+        # self.db.init_app(self.app)
+        #     # create all tables
+        #     self.db.create_all()
+
+class MutableList(Mutable, list):
+    def append(self, value):
+        list.append(self, value)
+        self.changed()
+
+    def pop(self, index=0):
+        value = list.pop(self, index)
+        self.changed()
+        return value
+
+    @classmethod
+    def coerce(cls, key, value):
+        if not isinstance(value, MutableList):
+            if isinstance(value, list):
+                return MutableList(value)
+            return Mutable.coerce(key, value)
+        else:
+            return value
+
+
+
+
+    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:hemid8th@localhost:5432/chirpr'
+    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+
+class Users(db.Model):
+    __tablename__ = 'users'
+    id = db.Column(db.String(), primary_key=True)
+    name = db.Column(db.String(), nullable=False)
+    avatar_url = db.Column(db.String(), nullable=False)
+    tweet_id = db.Column(MutableList.as_mutable(ARRAY(db.String())))
+    # tweets = db.relationship('tweets', backref='users', lazy = True)
+    # bookmarks = db.relationship('bookmarks', backref='users', lazy = True)
+
+    def __repr__(self):
+        return f'<Person ID: {self.id}, name: {self.name}>'
+
+class Tweets(db.Model):
+    __tablename__ = 'tweets'
+    id = db.Column(db.String(), primary_key=True)
+    text = db.Column(db.String(), nullable=False)
+    author = db.Column(db.String(), nullable=False)
+    timestamp = db.Column(BIGINT, nullable=False)
+    likes = db.Column(MutableList.as_mutable(ARRAY(db.String())))
+    replies = db.Column(MutableList.as_mutable(ARRAY(db.String())))
+    replying_to = db.Column(db.String())
+    # user_id = db.Column(db.String(), db.ForeignKey('users.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Person ID: {self.id}, name: {self.text}>'
+
+class Bookmarks(db.Model):
+    __tablename__ = 'bookmarks'
+    id = db.Column(db.String(), primary_key=True)
+    text = db.Column(db.String(), nullable=False)
+    author = db.Column(db.String(), nullable=False)
+    timestamp = db.Column(BIGINT, nullable=False)
+    likes = db.Column(MutableList.as_mutable(ARRAY(db.String())))
+    replies = db.Column(MutableList.as_mutable(ARRAY(db.String())))
+    replying_to = db.Column(db.String())
+    # user_id = db.Column(db.String(), db.ForeignKey('users.id'), nullable=False)
+
+    def __repr__(self):
+        return f'<Person ID: {self.id}, name: {self.text}>'
+
+
+
+
+    # with app.app_context():
+    #     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://hjuswuwprkjqob:3aad4d3b11016dc411cf037200db4c8482549ea95e54ca34b93e7001638cd1c1@ec2-54-147-36-107.compute-1.amazonaws.com:5432/d4dabpbqs3gli3'
+    #     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+    #     db.init_app(app)
+    #     db.create_all()
+    #     db = SQLAlchemy()
+    #     # db.app = app
+    #     CORS(app)
 
 
 @app.after_request
