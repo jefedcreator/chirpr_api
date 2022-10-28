@@ -1,44 +1,23 @@
 import sys
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
-# from models.models import Users, Tweets,Bookmarks, setup_db
 from flask_sqlalchemy import SQLAlchemy
-
-# Create and configure the app
-# Include the first parameter: Here, __name__is the name of the current Python module.
-from flask_sqlalchemy import SQLAlchemy
-import json
-from sqlalchemy.sql.schema import PrimaryKeyConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import BIGINT
 from sqlalchemy.ext.mutable import Mutable
-from settings.settings import DB_NAME, DB_USER, DB_PASSWORD
+from settings.settings import POSTGRES_URI
+
+# Create and configure the app
+# Include the first parameter: Here, __name__is the name of the current Python module.
 
 # database_path ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
 app = Flask(__name__)
 CORS(app)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://hjuswuwprkjqob:3aad4d3b11016dc411cf037200db4c8482549ea95e54ca34b93e7001638cd1c1@ec2-54-147-36-107.compute-1.amazonaws.com:5432/d4dabpbqs3gli3"
+app.config['SQLALCHEMY_DATABASE_URI'] = POSTGRES_URI
 # app.config["SQLALCHEMY_DATABASE_URI"] ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
-
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
-# app.config["SQLALCHEMY_BINDS"] = False
-# with app.app_context():
-#     # db.app = app
-#     # db.init_app(app)
 
-#     # db.init_app(app)
-#     db.create_all()
-
-
-
-# def setup_db(app):
-
-    # with app.app_context():
-        # self.db = SQLAlchemy()
-        # self.db.init_app(self.app)
-        #     # create all tables
-        #     self.db.create_all()
 
 class MutableList(Mutable, list):
     def append(self, value):
@@ -58,13 +37,6 @@ class MutableList(Mutable, list):
             return Mutable.coerce(key, value)
         else:
             return value
-
-
-
-
-    # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:hemid8th@localhost:5432/chirpr'
-    # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 
 class Users(db.Model):
     __tablename__ = 'users'
@@ -105,18 +77,6 @@ class Bookmarks(db.Model):
 
     def __repr__(self):
         return f'<Person ID: {self.id}, name: {self.text}>'
-
-
-
-
-    # with app.app_context():
-    #     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgres://hjuswuwprkjqob:3aad4d3b11016dc411cf037200db4c8482549ea95e54ca34b93e7001638cd1c1@ec2-54-147-36-107.compute-1.amazonaws.com:5432/d4dabpbqs3gli3'
-    #     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    #     db.init_app(app)
-    #     db.create_all()
-    #     db = SQLAlchemy()
-    #     # db.app = app
-    #     CORS(app)
 
 
 @app.after_request
@@ -577,11 +537,3 @@ def not_found(error):
         jsonify({"success": False, "error": 405, "message": "method not allowed"}),
         405,
     )
-
-# return app
-
-
-
-#always include this at the bottom of your code
-# if __name__ == '__main__':
-#     app.run(host="0.0.0.0", port=3000) 
