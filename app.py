@@ -23,12 +23,12 @@ app.config['SQLALCHEMY_DATABASE_URI'] = "postgres://hjuswuwprkjqob:3aad4d3b11016
 
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 # app.config["SQLALCHEMY_BINDS"] = False
-with app.app_context():
-    # db.app = app
-    # db.init_app(app)
+# with app.app_context():
+#     # db.app = app
+#     # db.init_app(app)
 
-    # db.init_app(app)
-    db.create_all()
+#     # db.init_app(app)
+#     db.create_all()
 
 
 
