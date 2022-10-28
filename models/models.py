@@ -5,6 +5,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import BIGINT
 from sqlalchemy.ext.mutable import Mutable
 from settings.settings import DB_NAME, DB_USER, DB_PASSWORD
+from app import db
 
 # database_path ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
 
@@ -33,7 +34,6 @@ class MutableList(Mutable, list):
 
     # app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:hemid8th@localhost:5432/chirpr'
     # app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-
 
 class Users(db.Model):
     __tablename__ = 'users'
