@@ -1,6 +1,19 @@
 # chirpr_api
 A Twitter esque social media with search Bookmark functionality
 
+# Table of Contents
+[Intoduction](#Introduction) 
+
+[Getting Started](#getting-started)
+
+[Development Setup](#development-setup)
+
+[API Walkthrough](#api-walkthrough)
+
+[Testing](#testing)
+
+[Live](#live-server)
+
 ## Introduction
 Twitter is a popular micro blogging social media where users can share tweets on their timeline, and also save particulat tweets theyre interested in a bookmarks section. but twitter requires users to keep scrolling in their bookmark sections whenever they're in need of a particular bookmarked tweet. Enter chirpr, chirpr aims to solve this UX problem by introducing searchable boomarks in every user's bookmark section, just by typing particular words in the search bar, bookmarked tweets are filtered by the typed keywords. 
 ## Overview
@@ -18,8 +31,12 @@ We recommend working within a virtual environment whenever using Python for proj
 
 #### PIP Dependencies
 
-Once you have your virtual environment setup and running, install dependencies by naviging to the `/backend` directory and running:
+Once you have your virtual environment setup and running, install dependencies by navigating to the `/chirpr_api` directory and running:
 
+bash
+```
+pip install -r requirements.txt
+```
 ##### Key Dependencies
 
 - [Flask](http://flask.pocoo.org/) is a lightweight backend microservices framework. Flask is required to handle requests and responses.
@@ -35,13 +52,19 @@ cd chirpr_api/
 These are the files relevant for this project:
 ```bash
 .
-├── flaskr
-    ├── __init__.py
+
 ├── models.py
-├── settings.py
-├── test.py
+├── settings
+    ├── settings.py
+├── .venv
+├── .env
 ├── README.md
+├── test.py
+├── app.py
+├── Procfile
+├── runtime.txt
 ├── requirements.txt
+├── wsgi.py
 ```
 
 ### **To comtribute to the upstream repository path from your local repository, use the commands below:**
@@ -95,7 +118,7 @@ python wsgi.py
 ### **Verify on the Browser**<br>
 Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or [http://localhost:5000](http://localhost:5000) 
 
-## API Example
+## API Walkthrough
 
 `GET '/api/v1.0/users'`
 - Fetches a dictionary of all users in which the keys are the user ids and the value is the corresponding dictionary of the user  details
@@ -295,3 +318,7 @@ Receives a json request `search_term` and filters the Bookmark database, and ret
 
 python test.py
 ```
+
+## Live server
+
+<b>[chirpr](https://chirpr-api.herokuapp.com/)

@@ -1,27 +1,28 @@
-import os
+
 import unittest
 import json
-from app import create_app
-from app import setup_db, Users, Tweets,Bookmarks, db
+from app import app, db
 from settings.settings import DB_NAME, DB_PASSWORD, DB_USER
 from flask_sqlalchemy import SQLAlchemy
-# from settings import DB_NAME, DB_USER, DB_PASSWORD
 
 class ChirprTestCase(unittest.TestCase):
     """This class represents the trivia test case"""
 
     def setUp(self):
         """Define test variables and initialize app."""
-        self.app = create_app()
+        self.app = app
         self.client = self.app.test_client
-        # self.database_name = "test_db"
         self.database_path = "postgresql://{}:{}@{}/{}".format(DB_USER,DB_PASSWORD,'localhost:5432', DB_NAME)
-        setup_db(self.app, self.database_path)
+        app.config["SQLALCHEMY_DATABASE_URI"] = self.database_path
         self.new_user = {
             "id": "random_author",
             "name": "Test User",
             "url": "https://demo.jpg",
             "tweets": [],
+        }
+        self.login_user = {
+            "id": "random_author",
+            "name": "Test User",
         }
         self.new_tweet = {
         "id": "8xf0y6ziyjabvozdd253ng",
@@ -89,12 +90,19 @@ class ChirprTestCase(unittest.TestCase):
 
     def test_create_users(self):
         res = self.client().post('/users/create', json=self.new_user)
-        # db.session.flush()
+
         data = json.loads(res.data)
 
         self.assertEqual(res.status_code, 200)
         self.assertEqual(data['success'], True)
-        # db.session.rollback()
+
+    def test_login_user(self):
+        res = self.client().post('/login', json=self.login_user)
+
+        data = json.loads(res.data)
+
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(data['success'], True)
 
 
     def test_get_user_by_id(self):

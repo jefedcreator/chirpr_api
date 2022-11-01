@@ -1,23 +1,24 @@
 import sys
 from flask import Flask, jsonify, request, abort
 from flask_cors import CORS
+from settings.settings import POSTGRES_URI
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.dialects.postgresql import BIGINT
 from sqlalchemy.ext.mutable import Mutable
-from settings.settings import POSTGRES_URI
-
+from flask_sqlalchemy import SQLAlchemy
+from settings.settings import DB_NAME,DB_USER,DB_PASSWORD
 # Create and configure the app
 # Include the first parameter: Here, __name__is the name of the current Python module.
 
-# database_path ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
+
+
 app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hjuswuwprkjqob:3aad4d3b11016dc411cf037200db4c8482549ea95e54ca34b93e7001638cd1c1@ec2-54-147-36-107.compute-1.amazonaws.com:5432/d4dabpbqs3gli3'
 # app.config["SQLALCHEMY_DATABASE_URI"] ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
-
 
 class MutableList(Mutable, list):
     def append(self, value):
@@ -77,6 +78,7 @@ class Bookmarks(db.Model):
 
     def __repr__(self):
         return f'<Person ID: {self.id}, name: {self.text}>'
+
 
 
 @app.after_request
@@ -157,8 +159,8 @@ def login_user():
     new_name = body.get("name", None)
     
     try:
-        user_id = Users.query.filter(Users.id == new_id).one_or_none()
-        user_name = Users.query.filter(Users.name == new_name).one_or_none()
+        user_id = Users.query.filter(Users.id == new_id).all()
+        user_name = Users.query.filter(Users.name == new_name).all()
         if user_id and user_name:
             return jsonify(
                 {
@@ -561,3 +563,4 @@ def not_found(error):
         jsonify({"success": False, "error": 405, "message": "method not allowed"}),
         405,
     )
+
