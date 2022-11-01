@@ -2,7 +2,7 @@ import os
 import unittest
 import json
 from app import create_app
-from models.models import setup_db, Users, Tweets,Bookmarks, db
+from app import setup_db, Users, Tweets,Bookmarks, db
 from settings.settings import DB_NAME, DB_PASSWORD, DB_USER
 from flask_sqlalchemy import SQLAlchemy
 # from settings import DB_NAME, DB_USER, DB_PASSWORD

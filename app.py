@@ -149,6 +149,31 @@ def add_user():
 
     finally:
         db.session.close()
+    
+@app.route('/login', methods=['POST'])
+def login_user():
+    body = request.get_json()
+    new_id = body.get("id", None)
+    new_name = body.get("name", None)
+    
+    try:
+        user_id = Users.query.filter(Users.id == new_id).one_or_none()
+        user_name = Users.query.filter(Users.name == new_name).one_or_none()
+        if user_id and user_name:
+            return jsonify(
+                {
+                    "success" : True,
+                }
+            )
+        else:
+            return jsonify(
+                {
+                    "success" : False,
+                }
+            )
+    except:
+        print(sys.exc_info())
+        abort(422)
 
 
 @app.route('/users/<user_id>', methods=['GET'])
@@ -255,7 +280,6 @@ def add_tweet():
     
     finally:
         db.session.close()
-
 
 @app.route('/tweets/<tweet_id>', methods=['PATCH', 'GET'])
 def update_tweet(tweet_id):
