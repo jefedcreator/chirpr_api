@@ -10,12 +10,19 @@ A Twitter esque social media with search Bookmark functionality
 
 [API Walkthrough](#api-walkthrough)
 
+[Docker](#docker)
+
 [Testing](#testing)
 
 [Live](#live-server)
 
 ## Introduction
 Twitter is a popular micro blogging social media where users can share tweets on their timeline, and also save particulat tweets theyre interested in a bookmarks section. but twitter requires users to keep scrolling in their bookmark sections whenever they're in need of a particular bookmarked tweet. Enter chirpr, chirpr aims to solve this UX problem by introducing searchable boomarks in every user's bookmark section, just by typing particular words in the search bar, bookmarked tweets are filtered by the typed keywords. 
+
+### Entity Relationship Diagram
+![My Image](chirpr_api_edr.jpg)
+
+
 ## Overview
 ## Getting Started
 
@@ -65,6 +72,9 @@ These are the files relevant for this project:
 ├── runtime.txt
 ├── requirements.txt
 ├── wsgi.py
+├── Dockerfile
+├── .gitignore
+
 ```
 
 ### **To comtribute to the upstream repository path from your local repository, use the commands below:**
@@ -153,6 +163,27 @@ Returns: An object with a two key,`success`, that contains a value of `True` if 
     
     "success" : "True",
     "users": "user_obj"
+}
+```
+
+`POST '/api/v1.0/login'`
+
+Sends a post request in order to login an existing user, receives a json request with user details
+Request Body:
+
+```json
+{
+    "id": "user id",
+    "name": "user name",
+}
+```
+
+Returns: An object with a key,`success`, that contains a value of `True` if successful, or `False` is user does not exist
+
+```json
+{
+    
+    "success" : "True",
 }
 ```
 
@@ -311,6 +342,46 @@ Receives a json request `search_term` and filters the Bookmark database, and ret
     "success": "True",
     "bookmarks": "bookmarks"
 }
+```
+
+## Docker
+After cloning, Navigate to the `chirpr_api` folder
+```bash
+cd chirpr_api
+``` 
+Open the VS code editor to display the file content
+
+```bash
+code .
+```
+
+Build an image
+
+```bash
+docker build -t chirprapi .
+
+```
+check list of images
+
+```bash
+docker image ls
+
+```
+
+Create and run a container
+
+```bash
+docker run --name chirprapi -p 80:8080 chirprapi
+
+```
+
+Access the application
+
+```bash
+# Mac/Linux users only
+curl http://0.0.0.0/
+# Windows users using WSL/GitBash
+curl http://127.0.0.1:80/
 ```
 
 ## Testing
