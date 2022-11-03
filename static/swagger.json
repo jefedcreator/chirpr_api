@@ -1,0 +1,723 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "description": "Chirpr api docs",
+    "version": "1.0.0",
+    "title": "Chirpr api",
+    "contact": {
+      "email": "jefiene77@gmail.com"
+    },
+    "license": {
+      "name": "MIT",
+      "url": "https://opensource.org/licenses/MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://chirpr-api.herokuapp.com/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users Requests",
+      "description": "Example API for requesting and returning user requests"
+    }
+  ],
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": ["Users Requests"],
+        "summary": "Returns userRequest",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/userRequest"
+            }
+          }
+        }
+      }
+    },
+    "/users/create": {
+      "post": {
+        "tags": ["Users Requests"],
+        "summary": "Create a new user request",
+        "requestBody": {
+            "description": "User Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/userPostBody"
+                }
+              }
+            }
+          },
+          "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/userRequest"
+            }
+          }
+        }
+      }
+    },
+    "/users/{user_id}": {
+      "parameters": [
+            {
+              "name": "user_id",
+              "in": "path",
+              "required": true,
+              "description": "ID of the cat that we want to match",
+              "type": "string"
+            }
+          ],
+      "get": {
+        "tags": ["Users Requests"],
+        "summary": "Fetches entire user details by id",
+        "parameters": [
+            {
+              "in": "path",
+              "name": "user_id",
+              "required": true,
+              "description": "User Request id",
+              "schema": {
+                "$ref": "#/components/schemas/user_id"
+              }
+            }
+          ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/userRequest"
+            }
+          },
+          "400": {
+            "description": "Failed. Bad post data."
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": ["Login Requests"],
+        "summary": "Login already existing user request",
+        "requestBody": {
+            "description": "Login Request Post Object",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/login"
+                }
+              }
+            }
+          },
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/userRequest"
+            }
+          },
+          "400": {
+            "description": "Failed. Bad post data."
+          }
+        }
+      }
+    },
+    "/tweets" : {
+        "get": {
+            "tags": ["Tweet Requests"],
+            "summary": "Fetches a dictionary of all tweets",
+            "responses": {
+              "201": {
+                "description": "OK",
+                "schema": {
+                  "$ref": "#/components/schemas/tweetRequest"
+                }
+              },
+              "400": {
+                "description": "Failed. Bad post data."
+              }
+            }
+          }
+    },
+    "/tweets/create": {
+        "post": {
+          "tags": ["Tweet Requests"],
+          "summary": "Create a new tweet request",
+          "requestBody": {
+              "description": "Tweet Request Post Object",
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/tweetPostBody"
+                  }
+                }
+              }
+            },
+            "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/tweetRequest"
+              }
+            }
+          }
+        }
+    },
+    "/tweets/{tweet_id}": {
+
+        "get": {
+          "tags": ["Tweet Requests"],
+          "summary": "Fetches entire tweet details by id",
+          "parameters": [
+              {
+                "in": "path",
+                "name": "tweet_id",
+                "required": true,
+                "description": "Tweet Request id",
+                "schema": {
+                  "$ref": "#/components/schemas/tweet_id"
+                }
+              }
+            ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/tweetRequest"
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        },
+        "patch" : {
+          "tags": ["Tweet Requests"],
+          "summary": "Updates an existing tweet request",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "tweet_id",
+              "required": true,
+              "description": "Tweet Request id",
+              "schema": {
+                "$ref": "#/components/schemas/tweet_id"
+              }
+            }
+          ],
+          "requestBody": {
+              "description": "Tweet Request Patch Object",
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/tweetPatchBody"
+                  }
+                }
+              }
+            },
+            "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/tweetPatchResponse"
+              }
+            }
+          }
+        }
+      },
+    "/bookmarks/{user_id}": {
+        "get": {
+          "tags": ["Bookmark Requests"],
+          "summary": "Fetches entire user bookmarks details with user id",
+          "parameters": [
+              {
+                "in": "path",
+                "name": "user_id",
+                "required": true,
+                "description": "Bookmark Request user id",
+                "schema": {
+                  "$ref": "#/components/schemas/user_id"
+                }
+              }
+            ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/bookmarkRequest"
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        }
+      },
+    "/bookmarks/create": {
+        "post": {
+          "tags": ["Bookmark Requests"],
+          "summary": "Create a new bookmark request",
+          "requestBody": {
+              "description": "Bookmark Request Post Object",
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/bookmarkPostBody"
+                  }
+                }
+              }
+            },
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/bookmarkRequest"
+              }
+            }
+          }
+        }
+    },
+    "/bookmarks/search": {
+        "post": {
+          "tags": ["Bookmark Requests"],
+          "summary": "Create bookmark search request",
+          "requestBody": {
+              "description": "Bookmark search Request Post Object",
+              "required": true,
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/searchRequest"
+                  }
+                }
+              }
+            },
+          "produces": ["application/json"],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/bookmarkRequest"
+              }
+            }
+          }
+        }
+    },
+    "/bookmark/{bookmark_id}": {
+        "get": {
+          "tags": ["Bookmark Requests"],
+          "summary": "Fetches entire user bookmarks details with bookmark id",
+          "parameters": [
+              {
+                "in": "path",
+                "name": "bookmark_id",
+                "required": true,
+                "description": "Bookmark Request bookmark id",
+                "schema": {
+                  "$ref": "#/components/schemas/bookmark_id"
+                }
+              }
+            ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/bookmarkRequest"
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+        },
+        "delete": {
+          "tags": ["Bookmark Requests"],
+          "summary": "Delete bookmark Request by ID",
+          "parameters": [
+              {
+                "in": "path",
+                "name": "bookmark_id",
+                "required": true,
+                "description": "Bookmark Request bookmark id",
+                "schema": {
+                  "$ref": "#/components/schemas/bookmark_id"
+                }
+              }
+            ],
+          "responses": {
+            "200": {
+              "description": "OK",
+              "schema": {
+                "$ref": "#/components/schemas/bookmarkRequest"
+              }
+            },
+            "400": {
+              "description": "Failed. Bad post data."
+            }
+          }
+       
+        }
+    },
+    "/request/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "description": "ID of the cat that we want to match",
+          "type": "string"
+        }
+      ],
+
+      "get": {
+        "tags": ["Book Request"],
+        "summary": "Get book request with given ID",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Book Request id",
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/bookRequest"
+            }
+          },
+          "400": {
+            "description": "Failed. Misunderstood Request."
+          },
+          "404": {
+            "description": "Failed. Book request not found."
+          }
+        }
+      },
+      "put": {
+        "summary": "edit a book request by ID",
+        "tags": ["Book Request"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Book Request id",
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Book Request Object",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/bookRequest"
+              }
+            }
+          }
+        },
+        "produces": ["application/json"],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/bookRequest"
+            }
+          },
+          "400": {
+            "description": "Failed. Bad post data."
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete Book Request by ID",
+        "tags": ["Book Request"],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "Book Request Id",
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/components/schemas/id"
+            }
+          },
+          "400": {
+            "description": "Failed. Misunderstood Request."
+          },
+          "404": {
+            "description": "Failed. Book Request not found."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "id": {
+        "properties": {
+          "uuid": {
+            "type": "string"
+          }
+        }
+      },
+      "user_id": {
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "tweet_id": {
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "boomark_id": {
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      },
+      "login": {
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "userPostBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "string"
+          },
+          "name": {
+            "type": "string",
+            "format": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "string"
+          },
+          "tweets": {
+            "type": []
+          }
+        }
+      },
+      "userRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "string"
+          },
+          "name": {
+            "type": "string",
+            "format": "string"
+          },
+          "url": {
+            "type": "string",
+            "format": "string"
+          },
+          "tweets": {
+            "type": []
+          }
+        }
+      },
+      "tweetRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "text": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          },
+          "likes": {
+            "type": []
+          },
+          "replies": {
+            "type": []
+          },
+          "replying_to" : {
+            "type" : "null || string"
+          }
+        }
+      },
+      "bookmarkRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          },
+          "likes": {
+            "type": []
+          },
+          "replies": {
+            "type": []
+          },
+          "replying_to" : {
+            "type" : "null || string"
+          }
+        }
+      },
+      "searchRequest": {
+        "type": "object",
+        "properties": {
+          "search_term": {
+            "type": "string"
+          }
+        }
+      },
+      "tweetPostBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "text": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          },
+          "likes": {
+            "type": []
+          },
+          "replies": {
+            "type": []
+          },
+          "replying_to" : {
+            "type" : "null"
+          }
+        }
+      },
+      "bookmarkPostBody": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number"
+          },
+          "text": {
+            "type": "string"
+          },
+          "author": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "number"
+          },
+          "likes": {
+            "type": []
+          },
+          "replies": {
+            "type": []
+          },
+          "replying_to" : {
+            "type" : "null || string"
+          }
+        }
+      },
+      "tweetPatchBody": {
+        "type": "object",
+        "properties": {
+          "likes": {
+            "type": "string"
+          },
+          "replies": {
+            "type": "string"
+          },
+          "replying_to" : {
+            "type" : "string"
+          }
+        }
+      },
+      "tweetPatchResponse": {
+        "type": "object",
+        "properties": {
+          "likes": {
+            "type": []
+          },
+          "likes_len": {
+            "type": "number"
+          },
+          "replies": {
+            "type": []
+          },
+          "replies_len": {
+            "type": "number"
+          },
+          "replying_to" : {
+            "type" : "string"
+          }
+        }
+      },
+      "bookRequests": {
+        "type": "object",
+        "properties": {
+          "bookRequest": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/bookRequest"
+            }
+          }
+        }
+      }
+    }
+  }
+}

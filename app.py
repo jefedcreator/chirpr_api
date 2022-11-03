@@ -8,10 +8,7 @@ from sqlalchemy.dialects.postgresql import BIGINT
 from sqlalchemy.ext.mutable import Mutable
 from flask_sqlalchemy import SQLAlchemy
 from settings.settings import DB_NAME,DB_USER,DB_PASSWORD
-# Create and configure the app
-# Include the first parameter: Here, __name__is the name of the current Python module.
-
-
+from flask_swagger_ui import get_swaggerui_blueprint
 
 app = Flask(__name__)
 CORS(app)
@@ -19,6 +16,19 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://hjuswuwprkjqob:3aad4d3b110
 # app.config["SQLALCHEMY_DATABASE_URI"] ="postgresql://{}:{}@{}/{}".format(DB_USER, DB_PASSWORD,'localhost:5432', DB_NAME)
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
+
+### swagger specific ###
+SWAGGER_URL = '/swagger'
+API_URL = '/static/swagger.json'
+SWAGGERUI_BLUEPRINT = get_swaggerui_blueprint(
+    SWAGGER_URL,
+    API_URL,
+    config={
+        'app_name': "Chipr api"
+    }
+)
+app.register_blueprint(SWAGGERUI_BLUEPRINT, url_prefix=SWAGGER_URL)
+### end swagger specific ###
 
 class MutableList(Mutable, list):
     def append(self, value):
@@ -45,8 +55,6 @@ class Users(db.Model):
     name = db.Column(db.String(), nullable=False)
     avatar_url = db.Column(db.String(), nullable=False)
     tweet_id = db.Column(MutableList.as_mutable(ARRAY(db.String())))
-    # tweets = db.relationship('tweets', backref='users', lazy = True)
-    # bookmarks = db.relationship('bookmarks', backref='users', lazy = True)
 
     def __repr__(self):
         return f'<Person ID: {self.id}, name: {self.name}>'
@@ -60,7 +68,6 @@ class Tweets(db.Model):
     likes = db.Column(MutableList.as_mutable(ARRAY(db.String())))
     replies = db.Column(MutableList.as_mutable(ARRAY(db.String())))
     replying_to = db.Column(db.String())
-    # user_id = db.Column(db.String(), db.ForeignKey('users.id'), nullable=False)
 
     def __repr__(self):
         return f'<Person ID: {self.id}, name: {self.text}>'
@@ -74,7 +81,6 @@ class Bookmarks(db.Model):
     likes = db.Column(MutableList.as_mutable(ARRAY(db.String())))
     replies = db.Column(MutableList.as_mutable(ARRAY(db.String())))
     replying_to = db.Column(db.String())
-    # user_id = db.Column(db.String(), db.ForeignKey('users.id'), nullable=False)
 
     def __repr__(self):
         return f'<Person ID: {self.id}, name: {self.text}>'
@@ -159,18 +165,12 @@ def login_user():
     new_name = body.get("name", None)
     
     try:
-        user_id = Users.query.filter(Users.id == new_id).all()
-        user_name = Users.query.filter(Users.name == new_name).all()
+        user_id = Users.query.filter(Users.id == new_id).one_or_none()
+        user_name = Users.query.filter(Users.name == new_name).one_or_none()
         if user_id and user_name:
             return jsonify(
                 {
                     "success" : True,
-                }
-            )
-        else:
-            return jsonify(
-                {
-                    "success" : False,
                 }
             )
     except:
@@ -322,33 +322,17 @@ def update_tweet(tweet_id):
                     )
             
             if "replies" in body:
-                for index in range(len(tweet.replies)):
-                    if tweet.replies[index] == body.get("replies"):
-                        # print("present",body.get("tweets"))
-                        tweet.replies.pop(index)
-                        # user.tweet_id.remove(value)
-                        db.session.commit()
-                    
-                        return jsonify(
-                            {
-                                "success": True,
-                                "replies": tweet.replies,
-                                "replies_len": len(tweet.replies)
-                            }
-                        )
-                
-                else:
-                    tweet.replies.append(body.get("replies"))
-                    db.session.commit()
+                tweet.replies.append(body.get("replies"))
+                db.session.commit()
 
-                    return jsonify(
-                        {
-                            "success": True,
-                            "replies": tweet.replies,
-                            "replies_len": len(tweet.replies)
-                        }
-                    )
-            
+                return jsonify(
+                    {
+                        "success": True,
+                        "replies": tweet.replies,
+                        "replies_len": len(tweet.replies)
+                    }
+                )
+     
             if "replying_to" in body:
                 tweet.replying_to = body.get("replying_to")
                 db.session.commit()
@@ -372,7 +356,7 @@ def update_tweet(tweet_id):
         try:
             tweet = Tweets.query.filter(Tweets.id==tweet_id).one_or_none()
         
-            if tweets is not None: 
+            if tweet is not None: 
                 tweet_list = []  
                 tweet_obj = {
                     "id": tweet.id,
@@ -457,7 +441,7 @@ def add_bookmark():
     finally:
         db.session.close()
 
-@app.route('/bookmarks/<bookmark_id>', methods=['GET', 'DELETE'])
+@app.route('/bookmark/<bookmark_id>', methods=['GET', 'DELETE'])
 def update_bookmark(bookmark_id):
     if request.method == 'GET':
         try:
@@ -476,15 +460,12 @@ def update_bookmark(bookmark_id):
                 }
                 bookmark_list.append(tweet_obj)
 
-                return jsonify(
-                    {
-                        "success": True,
-                        "tweets": bookmark_list
-                    }
-                )
-
-            else:
-                abort(400)
+            return jsonify(
+                {
+                    "success": True,
+                    "tweets": bookmark_list
+                }
+            )
         
         except:
             print(sys.exc_info())
@@ -492,10 +473,15 @@ def update_bookmark(bookmark_id):
     
     if request.method == 'DELETE':
         try:
-            Bookmarks.query.filter(Bookmarks.id==bookmark_id).delete()
-            db.session.commit()
+            bookmark = Bookmarks.query.filter(Bookmarks.id==bookmark_id).one_or_none()
+            if bookmark is not None:
+                bookmark.delete()
+                db.session.commit()
+                return jsonify({"success": True})
+            
+            else:
+                return jsonify({"success": False})
 
-            return jsonify({"success": True})
         except:
             db.session.rollback()
             print(sys.exc_info())
