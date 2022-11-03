@@ -130,7 +130,7 @@ Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or
 
 ## API Walkthrough
 
-`GET '/api/v1.0/users'`
+`GET '/api/users'`
 - Fetches a dictionary of all users in which the keys are the user ids and the value is the corresponding dictionary of the user  details
 - Request Arguments: None
 - Returns: An object with a two key,`success`, that contains a value of `True` if successful and `users`, that contains an object of `user_obj ` key: value pairs.
@@ -142,7 +142,7 @@ Navigate to project homepage [http://127.0.0.1:5000/](http://127.0.0.1:5000/) or
 }
 ```
 
-`POST '/api/v1.0/users/create'`
+`POST '/api/users/create'`
 
 Sends a post request in order to create a new user dictionary with user details
 Request Body:
@@ -166,7 +166,7 @@ Returns: An object with a two key,`success`, that contains a value of `True` if 
 }
 ```
 
-`POST '/api/v1.0/login'`
+`POST '/api/login'`
 
 Sends a post request in order to login an existing user, receives a json request with user details
 Request Body:
@@ -187,7 +187,7 @@ Returns: An object with a key,`success`, that contains a value of `True` if succ
 }
 ```
 
-`GET '/api/v1.0/users/${user_id}'`
+`GET '/api/users/${user_id}'`
 
 Fetches entire user details, including tweets for a user specified by their id request argument
 Request Arguments: id - string
@@ -200,7 +200,7 @@ Returns: A list of objects with user details for the specified user, and a list 
 }
 ```
 
-`GET '/api/v1.0/tweets'`
+`GET '/api/tweets'`
 
 - Fetches a dictionary of all tweets in which the keys are the tweet ids and the value is the corresponding dictionary of the tweet  details
 - Request Arguments: None
@@ -213,7 +213,7 @@ Returns: A list of objects with user details for the specified user, and a list 
 }
 ```
 
-`POST '/api/v1.0/tweets/create'`
+`POST '/api/tweets/create'`
 
 Sends a post request in order to create a new tweet dictionary with tweet details
 Request Body:
@@ -240,7 +240,7 @@ Returns: An object with a two key,`success`, that contains a value of `True` if 
 }
 ```
 
-`GET '/api/v1.0/tweets/${tweet_id}'`
+`GET '/api/tweets/${tweet_id}'`
 
 Fetches entire tweet details, including tweets for a user specified by their id request argument
 Request Arguments: id - string
@@ -253,7 +253,7 @@ Returns: A list of objects with tweet details for the specified tweet id
 }
 ```
 
-`PATCH '/api/v1.0/tweets/${tweet_id}'`
+`PATCH '/api/tweets/${tweet_id}'`
 
 Modifies the `likes` and `replies` column specified by the `tweet_id`. this request checks if a `user's likes` already exists within the likes array and pops it, else appends to it.
 this request also checks if a `user's replies` already exists within the replies array and pops it, else appends to it.
@@ -269,7 +269,7 @@ Request Body:
 }
 ```
 
-`GET '/api/v1.0/bookmarks'`
+`GET '/api/bookmarks/user_id'`
 - Fetches a dictionary of all bookmarks in which the keys are the bookmarks ids and the value is the corresponding dictionary of the bookmark details
 - Request Arguments: None
 - Returns: An object with a two key,`success`, that contains a value of `True` if successful and `bookmarks`, that contains an object of `bookmarks ` key: value pairs.
@@ -281,7 +281,7 @@ Request Body:
 }
 ```
 
-`POST '/api/v1.0/bookmarks/create'`
+`POST '/api/bookmarks/create'`
 
 Sends a post request in order to create a new bookmark dictionary with tweet details
 Request Body:
@@ -308,7 +308,7 @@ Returns: An object with a two key,`success`, that contains a value of `True` if 
 }
 ```
 
-`GET '/api/v1.0/bookmarks/${bookmark_id}'`
+`GET '/api/bookmark/${bookmark_id}'`
 
 Fetches entire bookmark details, including bookmarks for a user specified by their id request argument
 Request Arguments: id - string
@@ -321,7 +321,7 @@ Returns: A list of objects with tweet details for the specified bookmark id
 }
 ```
 
-`DELETE '/api/v1.0/bookmarks/${bookmark_id}'`
+`DELETE '/api/bookmark/${bookmark_id}'`
 
 deletes entire bookmark details, including bookmarks for a user specified by their id request argument
 Request Arguments: id - string
@@ -333,7 +333,7 @@ Returns: `success` with value of `True`
 }
 ```
 
-`POST '/api/v1.0/bookmarks/search'`
+`POST '/api/bookmarks/search'`
 
 Receives a json request `search_term` and filters the Bookmark database, and returns a list of Bookmarks containing `id` and `text` object that match specified request
 
@@ -392,4 +392,4 @@ python test.py
 
 ## Live server
 
-<b>[chirpr](https://chirpr-api.herokuapp.com/)
+<b>[chirpr](https://chirpr-api.herokuapp.com/swagger)
